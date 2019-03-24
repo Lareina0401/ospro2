@@ -24,3 +24,4 @@
 #define SYS_enable_sched_trace  23
 #define SYS_set_sched    24
 #define SYS_set_priority  25
+#define SYS_fork_rc_test 26

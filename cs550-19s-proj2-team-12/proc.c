@@ -222,6 +222,10 @@ fork(void)
 
   release(&ptable.lock);
 
+if(winner == 1){//here
+      curproc->state = RUNNING;
+      yield();
+  }
   return pid;
 }
 

@@ -99,6 +99,19 @@ int sys_shutdown(void)
   return 0;
 }
 
+int sys_fork_rc_test(void){
+    int n;
+    if(!argint(0,&n)){
+        if(n==1){
+      winner=1;
+  }
+        else{
+      winner=0;
+  }
+    }
+    return 0;
+}
+
 extern int sched_trace_enabled;
 int sys_enable_sched_trace(void)
 {

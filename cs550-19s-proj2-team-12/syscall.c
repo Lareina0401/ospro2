@@ -107,6 +107,7 @@ extern int sys_shutdown(void);
 extern int sys_enable_sched_trace(void);
 extern int sys_set_sched(void);
 extern int sys_set_priority(void);
+extern int sys_fork_rc_test(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -134,6 +135,7 @@ static int (*syscalls[])(void) = {
 [SYS_enable_sched_trace]   sys_enable_sched_trace,
 [SYS_set_sched] sys_set_sched,
 [SYS_set_priority] sys_set_priority,
+[SYS_fork_rc_test] sys_fork_rc_test,
 };
 
 void
