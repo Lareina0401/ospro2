@@ -110,13 +110,16 @@ int sys_enable_sched_trace(void)
   return 0;
 }
 
+extern int sched_set;
+
 int
 sys_set_sched(void)
 {
   int n;
   if(argint(0,&n)<0)
     return -1;
-  set_sched(n);
+  if(n)
+    sched_set=1;
   return 0;
 }
 

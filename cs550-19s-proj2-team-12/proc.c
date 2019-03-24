@@ -17,7 +17,7 @@ static struct proc *initproc;
 int nextpid = 1;
 int sched_trace_enabled = 0; // ZYF: for OS CPU/process project
 
-int sched_type=0;
+int sched_set=0;
 
 extern void forkret(void);
 extern void trapret(void);
@@ -323,7 +323,7 @@ wait(void)
 //  - swtch to start running that process
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
-void 
+/*void 
 set_sched(int n)
 {
   if(n==0||n==1)
@@ -334,30 +334,18 @@ set_sched(int n)
   }
   else
     exit();
-}
+}*/
 
-void
+int
 set_priority(int pi,int pri)
 {
   acquire(&ptable.lock);
   struct proc *p;
   for(p=ptable.proc;p<&ptable.proc[NPROC];p++)
   {
-    if(p->pid==pi)//find target pid
-    {
+    if(p->pid==pi)
       p->priority=pri;
-      p->state=RUNNABLE;
-      sched();
-      //cprintf("pid:%d set to priority %d,,proc_state%d\n",p->pid,p->priority,proc->pid);
-
-      cprintf("pid:%d set to priority %d,,proc_state%d\n",p->pid,p->priority,proc->pid);
-      release(&ptable.lock);
-      return;
-    }
   }
-  for(p=ptable.proc;p<&ptable.proc[NPROC];p++)
-    cprintf("scanning, current pid%d,priority:%d\n",p->pid,p->priority);//for debugging
-
   release(&ptable.lock);
   return;
 
@@ -371,113 +359,50 @@ struct proc *pnext;
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
+  int max_priority;
+
  
   int ran = 0; // CS 350/550: to solve the 100%-CPU-utilization-when-idling problem
-  if(sched_type==0)//default policy
-{ 
+  
   for(;;){
-    // Enable interrupts on this processor.
     sti();
-
-    // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    ran = 0;
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
+    max_priority=-1;
+    if(sched_set==1){
+      for(p=ptable.proc;p<&ptable.proc[NPROC];p++){
+        if(p->state != RUNNABLE)
+          continue;
+        if(max_priority<p->priority)
+          max_priority=p->priority;
+      }
+    }
+
+    ran=0;
+    for(p=ptable.proc;p<&ptable.proc[NPROC];p++){
+      if(p->stste != RUNNABLE)
         continue;
+      if(p->priority<max_priority)
+        continue;
+      ran=1;
 
-cprintf("from normal:pid:%d priority:%d\n",p->pid,p->priority);
-
-      ran = 1;
-      
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      c->proc = p;
+      c->proc=p;
       switchuvm(p);
-      p->state = RUNNING;
+      p->stste =RUNNING;
 
       swtch(&(c->scheduler), p->context);
       switchkvm();
 
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
+      c->proc=0;
     }
+
     release(&ptable.lock);
 
-    if (ran == 0){
-        halt();
+    if(ran==0){
+      halt();
     }
   }
-}
-
-else if(sched_type==1)//priority policy
-{
-  for(;;){
-  int max_priority=0;
-  acquire(&ptable.lock);
-  for(pnext->ptable.proc;pnext<&ptable.proc[NPROC];pnext++)
-  {
-    if(pnext->state!=RUNNABLE)
-      continue;
-    if(max_priority==0)
-    {
-      max_priority=pnext->priority;
-    }
-    if(max_priority>0)
-    {
-      if(max_priority<=pnext->priority)
-      {
-        max_priority=pnext->priority;
-        cprintf("pid=%d,priority=%d\n",p->pid,p->priority);
-      }
-      }
-    }
   }
 
-for(p=ptable.proc;p<&ptable.proc[NPROC];p++)
-{
-  if(p->state!=RUNNABLE)
-    continue;
-  cprintf("pid:%d,,lastrunned:%d\n",p->pid,p->lastrunned);
-  cprintf("enter priority:%d,pid:%d\n",p->priority,p->pid);
-  if(max_priority==priority)//????
-  {
-    if(p->lastrunned%2==0)
-    {
-      ran=1;
-      c->proc=p;
-      p->lastrunned++;
-    }
-    else{
-      p->lastrunned--;
-      continue;
-    }
-  }
-  else
-    continue;
-
-  switchuvm(p);
-      p->state = RUNNING;
-
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
-
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
-      cprintf("pnext:%d priority:%d\n",pnext->pid,pnext->priority);
-
-}
-release(&ptable.lock);
-
-    if (ran == 0){
-        halt();
-    }
-  }
-}
-}
 
 // Enter scheduler.  Must hold only ptable.lock
 // and have changed proc->state. Saves and restores

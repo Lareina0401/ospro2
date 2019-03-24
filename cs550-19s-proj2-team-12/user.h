@@ -40,4 +40,4 @@ int atoi(const char*);
 void shutdown(void);
 void enable_sched_trace(int enable);
 void set_sched(int);
-void set_priority(int ,int);
+int set_priority(int ,int);
