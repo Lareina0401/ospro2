@@ -112,7 +112,7 @@ int sys_enable_sched_trace(void)
 
 extern int sched_set;
 
-int
+int 
 sys_set_sched(void)
 {
   int n;
@@ -123,13 +123,17 @@ sys_set_sched(void)
   return 0;
 }
 
-int
+int 
 sys_set_priority(void)
 {
   int pid;
   int priority;
+  if(argint(0,&pid)<0)
+	  return -1;
+  if(argint(0,&priority)<0)
+	  return -1;
   argint(0,&pid);
   argint(1,&priority);
-  set_priority(pid,priority);
-  return 0;
+ return set_priority(pid,priority);
+ 
 }

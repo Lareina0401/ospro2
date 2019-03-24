@@ -336,26 +336,26 @@ set_sched(int n)
     exit();
 }*/
 
-int
-set_priority(int pi,int pri)
+/*int
+set_priority(int pid,int priority)
 {
   acquire(&ptable.lock);
   struct proc *p;
   for(p=ptable.proc;p<&ptable.proc[NPROC];p++)
   {
-    if(p->pid==pi)
-      p->priority=pri;
+    if(p->pid==pid)
+      p->priority=priority;
   }
   release(&ptable.lock);
-  return;
+  return pid;
 
 }
-
+*/
 void
 scheduler(void)
 {
   
-struct proc *pnext;
+//struct proc *pnext;
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
@@ -379,7 +379,7 @@ struct proc *pnext;
 
     ran=0;
     for(p=ptable.proc;p<&ptable.proc[NPROC];p++){
-      if(p->stste != RUNNABLE)
+      if(p->state != RUNNABLE)
         continue;
       if(p->priority<max_priority)
         continue;
@@ -387,7 +387,7 @@ struct proc *pnext;
 
       c->proc=p;
       switchuvm(p);
-      p->stste =RUNNING;
+      p->state =RUNNING;
 
       swtch(&(c->scheduler), p->context);
       switchkvm();
@@ -585,4 +585,18 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+int
+set_priority(int pid,int priority)
+{
+  struct proc *p;
+  acquire(&ptable.lock);
+  for(p=ptable.proc;p<&ptable.proc[NPROC];p++)
+  {
+	  if(p->pid ==pid)
+		  p->priority =priority;
+  }
+  release(&ptable.lock);
+  return pid;
 }

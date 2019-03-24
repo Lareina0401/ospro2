@@ -155,8 +155,8 @@ int             argstr(int, char**);
 int             fetchint(uint, int*);
 int             fetchstr(uint, char**);
 void            syscall(void);
-void            set_sched(int);
-void            set_priority(int,int);
+int            set_sched(int);
+int            set_priority(int,int);
 // timer.c
 void            timerinit(void);
 
